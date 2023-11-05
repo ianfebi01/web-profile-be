@@ -13,12 +13,14 @@
   "author": "Ian Febi S",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.5.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "esm": "^3.2.25",
     "express": "^4.18.2",
     "helmet": "^7.0.0",
+    "http-status": "^1.7.3",
     "jsonwebtoken": "^9.0.2",
     "ts-node": "^10.9.1",
     "typecript": "^0.0.1-security"
@@ -38,6 +40,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
+    "prisma": "^5.5.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "*"
   }
