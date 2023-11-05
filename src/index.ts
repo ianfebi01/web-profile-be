@@ -2,12 +2,12 @@ import express, {Express, Response, Request } from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import createError from 'http-errors'
-import { promises as fspromises } from 'fs';
+import { promises as fspromises } from 'node:fs';
 
 dotenv.config()
 
 
-const app:Express = express()
+const app: Express = express()
 
 app.use( express.json() )
 
@@ -17,11 +17,10 @@ app.use( cors() )
 // Port
 const PORT: string = process.env.PORT ?? "8000"
 
-
 // Routes
 const init = async () => {
 	const files = await fspromises.readdir( `${__dirname}/routes` );
-	const createroute = async ( file:string ) => {
+	const createroute = async ( file: string ) => {
 		const route = await import( `./routes/${file}` );
 		app.use( "/", route.default );
 	};

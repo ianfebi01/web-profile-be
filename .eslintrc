@@ -14,14 +14,14 @@
       "files": ["*.ts"],
       "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
       ],
       "parserOptions": {
         "project": ["./tsconfig.json"]
       }
     }
   ],
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint","unicorn"],
   // "parserOptions": {
   //   "ecmaVersion": "latest",
   //   "sourceType": "module"
@@ -34,8 +34,9 @@
   "rules": {
     "key-spacing": [
       "error",
-      { "align": "colon" },
+      { "align": "colon",  "beforeColon": true, "afterColon": true},
     ],
+  
     "brace-style": "error",
     "indent": ["error", "tab"],
     "comma-spacing": ["error", { "before": false, "after": true }],
@@ -44,7 +45,11 @@
       "error",
       { "blankLine": "always", "prev": "var", "next": "return" }
     ],
-    "newline-before-return": "error"
+    "newline-before-return": "error",
+    // typescript-eslint
+    "@typescript-eslint/type-annotation-spacing": "error",
+    // unicord
+    "unicorn/prefer-switch": ["error", {"minimumCases": 3}]
   },
   "ignorePatterns": ["*!.*", "dist", "build", "node_modules"]
 }
