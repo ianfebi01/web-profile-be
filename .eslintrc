@@ -46,6 +46,9 @@
       { "blankLine": "always", "prev": "var", "next": "return" }
     ],
     "newline-before-return": "error",
+    "object-curly-spacing": ["error", "always"],
+    "no-console": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
     // typescript-eslint
     "@typescript-eslint/type-annotation-spacing": "error",
     // unicord
