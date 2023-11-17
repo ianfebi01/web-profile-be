@@ -13,7 +13,7 @@
   "author": "Ian Febi S",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.5.2",
+    "@prisma/client": "^5.6.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -43,7 +43,7 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-unicorn": "^49.0.0",
-    "prisma": "^5.5.2",
+    "prisma": "^5.6.0",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "*"

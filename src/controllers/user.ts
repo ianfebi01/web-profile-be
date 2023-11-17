@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import createError from "http-errors";
 import prisma from "@/utils/prisma";
 import * as status from "http-status";
 import { IPostProfileParams } from "@/types/profile";
@@ -37,7 +36,11 @@ export const getUsers = async ( req: Request, res: Response ) => {
 		// 		message : 
 		// 	} )
 			
-		return createError( 500, error )
+		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+			message : status[status.INTERNAL_SERVER_ERROR],
+			status  : status.INTERNAL_SERVER_ERROR,
+			data    : error
+		} )
 	}
 }
 	
@@ -49,6 +52,9 @@ export const postUser = async ( req: Request, res: Response )=>{
 		const isAlreadyExists = await prisma.user.findUnique( {
 			where : {
 				email
+			},
+			select : {
+				email : true
 			}
 		} )
 		
@@ -69,6 +75,11 @@ export const postUser = async ( req: Request, res: Response )=>{
 		} )
 		// eslint-disable-next-line
 	} catch ( error: any ) {
-		return createError( 500, error )
+		
+		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+			message : status[status.INTERNAL_SERVER_ERROR],
+			status  : status.INTERNAL_SERVER_ERROR,
+			data    : error
+		} )
 	}
 }
