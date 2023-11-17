@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn src/index.ts",
+    "dev": "npx ts-node-dev -r tsconfig-paths/register ./src/index.ts",
     "build": "rm -rf build && node esbuild.js",
     "lint": "eslint src/** --ext .ts"
   },
@@ -32,6 +32,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.20",
     "@types/helmet": "^4.0.0",
+    "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/node": "^20.8.10",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
@@ -44,6 +45,7 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "prisma": "^5.5.2",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "*"
   }
 }

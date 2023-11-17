@@ -15,8 +15,8 @@ model User {
   email String @unique
   name String
   quote String?
-  positionId Int @unique
-  position Position @relation(fields: [positionId],references: [id])
+  positionId Int? @unique
+  position Position? @relation(fields: [positionId],references: [id])
   portofolios Portofolio[]
 }
 

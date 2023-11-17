@@ -1,11 +1,10 @@
-import express, {Express, Response, Request } from 'express'
+import express, { Express, Response, Request } from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import createError from 'http-errors'
 import { promises as fspromises } from 'node:fs';
 
 dotenv.config()
-
 
 const app: Express = express()
 
@@ -19,10 +18,10 @@ const PORT: string = process.env.PORT ?? "8000"
 
 // Routes
 const init = async () => {
-	const files = await fspromises.readdir( `${__dirname}/routes` );
+	const files = await fspromises.readdir( `${__dirname}/routes/v1` );
 	const createroute = async ( file: string ) => {
-		const route = await import( `./routes/${file}` );
-		app.use( "/", route.default );
+		const route = await import( `./routes/v1//${file}` );
+		app.use( "/v1/", route.default );
 	};
 	await Promise.all( files.map( createroute ) );
 }
@@ -39,6 +38,7 @@ const init = async () => {
 
 	//  start server
 	app.listen( PORT, () => {
+		// eslint-disable-next-line no-console
 		console.log( 'listening on port', PORT ) 
 	} )
 
