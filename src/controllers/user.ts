@@ -30,12 +30,7 @@ export const getUsers = async ( req: Request, res: Response ) => {
 			hasNextPage
 		} )
 		// eslint-disable-next-line
-	} catch ( error: any ) {
-		// return res.status( status.INTERNAL_SERVER_ERROR )
-		// 	.json( {
-		// 		message : 
-		// 	} )
-			
+	} catch ( error: unknown ) {
 		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
 			message : status[status.INTERNAL_SERVER_ERROR],
 			status  : status.INTERNAL_SERVER_ERROR,
@@ -74,7 +69,7 @@ export const postUser = async ( req: Request, res: Response )=>{
 			data    : results
 		} )
 		// eslint-disable-next-line
-	} catch ( error: any ) {
+	} catch ( error: unknown ) {
 		
 		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
 			message : status[status.INTERNAL_SERVER_ERROR],

@@ -19,7 +19,47 @@ export const getPositions = async( req: Request, res: Response )=>{
 			data    : results
 		} )
 		// eslint-disable-next-line
-	} catch ( error:any ) {
+	} catch ( error: unknown ) {
+		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+			message : status[status.INTERNAL_SERVER_ERROR],
+			status  : status.INTERNAL_SERVER_ERROR,
+			data    : error
+		} )
+	}
+}
+
+export const postPosition = async ( req: Request, res: Response ) => {
+	try {
+		const body  = req.body
+		const { name, description } = body
+        
+		const isAlreadyExists = await prisma.position.findUnique( {
+			where : {
+				name
+			},
+			select : {
+				name : true
+			}
+		} )
+		
+		if( isAlreadyExists ) return res.status( status.BAD_REQUEST ).json( {
+			message : "Position already exists",
+			status  : status.BAD_REQUEST
+		} )
+
+		const results = await prisma.position.create( {
+			data : {
+				name, description
+			}
+		} )
+
+		return res.status( status.CREATED ).json( {
+			message : "Position created",
+			status  : status.CREATED,
+			data    : results
+		} )
+
+	} catch ( error: unknown ) {
 		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
 			message : status[status.INTERNAL_SERVER_ERROR],
 			status  : status.INTERNAL_SERVER_ERROR,
