@@ -1,8 +1,9 @@
 import prisma from "@/utils/prisma";
 import { Request, Response } from "express";
 import * as status from "http-status";
+import createResponseError from "@/utils/createResponseError";
 
-export const getPositions = async( req: Request, res: Response )=>{
+export const getPositions = async( req: Request, res: Response ) => {
 	try {
 		const q = req.query.q || ''
 		const results = await prisma.position.findMany( {
@@ -20,11 +21,7 @@ export const getPositions = async( req: Request, res: Response )=>{
 		} )
 		// eslint-disable-next-line
 	} catch ( error: unknown ) {
-		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
-			message : status[status.INTERNAL_SERVER_ERROR],
-			status  : status.INTERNAL_SERVER_ERROR,
-			data    : error
-		} )
+		createResponseError( res, error )
 	}
 }
 
@@ -60,10 +57,6 @@ export const postPosition = async ( req: Request, res: Response ) => {
 		} )
 
 	} catch ( error: unknown ) {
-		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
-			message : status[status.INTERNAL_SERVER_ERROR],
-			status  : status.INTERNAL_SERVER_ERROR,
-			data    : error
-		} )
+		createResponseError( res, error )
 	}
 }

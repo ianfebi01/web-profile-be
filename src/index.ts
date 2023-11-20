@@ -3,6 +3,8 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import createError from 'http-errors'
 import { promises as fspromises } from 'node:fs';
+import fileUpload from "express-fileupload"
+import * as status from "http-status"
 
 dotenv.config()
 
@@ -12,6 +14,14 @@ app.use( express.json() )
 
 // Cors
 app.use( cors() )
+
+// File Upload
+app.use(
+	fileUpload( {
+		useTempFiles : true,
+		tempFileDir  : 'src/tmp/'
+	} )
+)
 
 // Port
 const PORT: string = process.env.PORT ?? "8000"
@@ -26,6 +36,13 @@ const init = async () => {
 	await Promise.all( files.map( createroute ) );
 }
 
+const errorHandler = ( err: Error, req: Request, res: Response ) => { 
+	res.status( status.INTERNAL_SERVER_ERROR ).send( {
+		message : err.message,
+		status  : status.INTERNAL_SERVER_ERROR,
+	} ); 
+};
+
 ( async() => {
 
 	// Initialize Routes
@@ -36,6 +53,7 @@ const init = async () => {
 		next( createError( 404 ) )
 	} )
 
+	app.use( errorHandler ); 
 	//  start server
 	app.listen( PORT, () => {
 		// eslint-disable-next-line no-console

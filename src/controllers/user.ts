@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import prisma from "@/utils/prisma";
 import * as status from "http-status";
 import { IPostProfileParams } from "@/types/profile";
+import createResponseError from "@/utils/createResponseError";
 
 export const getUsers = async ( req: Request, res: Response ) => {
 	try {
@@ -29,17 +30,12 @@ export const getUsers = async ( req: Request, res: Response ) => {
 			itemCount : results?.length,
 			hasNextPage
 		} )
-		// eslint-disable-next-line
 	} catch ( error: unknown ) {
-		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
-			message : status[status.INTERNAL_SERVER_ERROR],
-			status  : status.INTERNAL_SERVER_ERROR,
-			data    : error
-		} )
+		createResponseError( res, error )
 	}
 }
 	
-export const postUser = async ( req: Request, res: Response )=>{
+export const postUser = async ( req: Request, res: Response ) => {
 	try {
 		const body = req.body
 		const { email, name, quote }: IPostProfileParams = body
@@ -68,13 +64,7 @@ export const postUser = async ( req: Request, res: Response )=>{
 			status  : status.CREATED,
 			data    : results
 		} )
-		// eslint-disable-next-line
 	} catch ( error: unknown ) {
-		
-		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
-			message : status[status.INTERNAL_SERVER_ERROR],
-			status  : status.INTERNAL_SERVER_ERROR,
-			data    : error
-		} )
+		createResponseError( res, error )
 	}
 }

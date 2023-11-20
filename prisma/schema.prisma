@@ -14,10 +14,12 @@ model User {
   id Int @default(autoincrement()) @id
   email String @unique
   name String
+  avatar String?
   quote String?
   positionId Int? @unique
   position Position? @relation(fields: [positionId],references: [id])
   portofolios Portofolio[]
+  userToken UserToken?
 
   @@index([id, email])
 }
@@ -42,8 +44,17 @@ model Portofolio {
 
 model Skill {
   id Int @default(autoincrement()) @id
-  name String
+  name String @unique
   description String?
   image String
   portofolios Portofolio[]
+}
+
+model UserToken{
+  userId Int @unique
+  user User? @relation(fields: [userId],references: [id])
+  accessToken String @unique
+  refreshToken String @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }

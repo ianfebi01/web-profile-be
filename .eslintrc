@@ -50,6 +50,7 @@
     "no-console": "error",
     "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
     "space-infix-ops": ["error", { "int32Hint": false }],
+    "arrow-spacing": "error",
     // typescript-eslint
     "@typescript-eslint/type-annotation-spacing": "error",
     // unicord
