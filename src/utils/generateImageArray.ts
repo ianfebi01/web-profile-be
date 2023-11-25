@@ -1,11 +1,10 @@
-import { IApiImage } from "@/types/uploadImage"
 
-const generateImageArray = ( imageData: IApiImage ) => {
-	if ( imageData.format === 'svg' ){
+const generateImageArray = ( url: string ) => {
+	if ( url.slice( -3 ) === 'svg' ){
 		return [
-			{ url : imageData.secure_url }
+			{ url : url }
 		]
-	}else return imageCompress( imageData.secure_url )
+	}else return imageCompress( url )
 }
 
 const imageCompress = ( url: string ) => {

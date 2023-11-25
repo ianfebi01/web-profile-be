@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken"
+import jwt, { JsonWebTokenError } from "jsonwebtoken"
 import * as status from "http-status"
 import { RequestHandler } from "express"
 import prisma from "./prisma"
@@ -36,10 +36,12 @@ export const verifyAccessToken: RequestHandler = async ( req, res, next ) => {
 
 		jwt.verify( token, process.env.JWT_TOKEN_SECRET as string, ( err ) => {
 			if ( err ) {
+				const error = err as JsonWebTokenError
+				
 				return res
 					.status( status.UNAUTHORIZED )
 					.json( { 
-						message : status[status.UNAUTHORIZED],
+						message : error.message,
 						status  : status.UNAUTHORIZED
 					} )
 			}

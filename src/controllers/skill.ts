@@ -36,7 +36,7 @@ export const postSkill: RequestHandler = async ( req, res ) => {
 			const imageData: IApiImage = await uploadToCloudinary( files[0], 'web-profile' ) as IApiImage;
 			imageUrl = imageData?.secure_url
 
-			const compressedImages: IImages[] = generateImageArray( imageData )
+			const compressedImages: IImages[] = generateImageArray( imageData?.secure_url )
 			compressedImages?.map( ( item: IImages ) => {
 				images.push( item )
 			} )

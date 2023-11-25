@@ -4,6 +4,7 @@ import prisma from "@/utils/prisma";
 import axios from "axios";
 import { RequestHandler } from "express";
 import * as status from "http-status"
+import jwt from "jsonwebtoken"
 
 export const githubAuth: RequestHandler = async( req, res ) => {
 	try {
@@ -35,7 +36,7 @@ export const githubAuth: RequestHandler = async( req, res ) => {
 		} )
 		
 		if( isAlreadyExists ) {
-			const accessToken = generateToken( { id : isAlreadyExists.id }, "14m" )
+			const accessToken = generateToken( { id : isAlreadyExists.id }, "5m" )
 			const refreshToken = generateToken( { id : isAlreadyExists.id }, "7d" )
 			
 			const isTokenEexist = await prisma.userToken.findUnique( {
@@ -83,7 +84,7 @@ export const githubAuth: RequestHandler = async( req, res ) => {
 			}
 		} )
 
-		const accessToken = generateToken( { id : results.id }, "14m" )
+		const accessToken = generateToken( { id : results.id }, "5m" )
 		const refreshToken = generateToken( { id : results.id }, "7d" )
 
 		const isTokenEexist = await prisma.userToken.findUnique( {
@@ -120,7 +121,76 @@ export const githubAuth: RequestHandler = async( req, res ) => {
 				refreshToken : userToken.refreshToken 
 			}
 		} )
-	} catch ( error: unknown ) {
+	} catch ( error ) {
+		
+		// if ( axios.isAxiosError( error ) ){
+		// 	return res.status( error?.response?.status as number ).json( {
+		// 		messsage : error?.response?.data?.message,
+		// 		status   : error?.response?.status
+		// 	} )
+		// }
 		createResponseError( res, error )
+	}
+}
+
+export const refreshToken: RequestHandler = async ( req, res ) => {
+	try {
+		const tmp = req.header( "Authorization" );
+		const token = tmp ? tmp.slice( 7, tmp.length ) : "";
+
+		if ( !token ) {
+			return res
+				.status( status.UNAUTHORIZED )
+				.json( { 
+					message : 'Please set token headers',
+					status  : status.UNAUTHORIZED
+				} )
+		}
+
+		const userToken = await prisma.userToken.findUnique( {
+			where : {
+				refreshToken : token 
+			},
+			select : {
+				refreshToken : true,
+				userId       : true,
+			}
+		} )
+
+		if ( !userToken ){
+			return res.status( status.UNAUTHORIZED ).json( {
+				message : "Invalid access token",
+				status  : status[status.UNAUTHORIZED],
+			} )
+		}
+
+		jwt.verify( token, process.env.JWT_TOKEN_SECRET as string, async ( err ) => {
+			if ( err ) {
+				return res
+					.status( status.UNAUTHORIZED )
+					.json( { 
+						message : status[status.UNAUTHORIZED],
+						status  : status.UNAUTHORIZED
+					} )
+			}
+			const accessToken = generateToken( { id : userToken.userId }, "5m" )
+
+			const updateToken = await prisma.userToken.update( {
+				where : {
+					userId : userToken.userId
+				},
+				data : {
+					accessToken : accessToken,
+				},
+			} )
+			
+			return res.status( status.OK ).json( {
+				message : "Updated token",
+				status  : status.OK,
+				data    : updateToken
+			} )
+		} )
+	} catch ( error ) {
+		return createResponseError( res, error )
 	}
 }

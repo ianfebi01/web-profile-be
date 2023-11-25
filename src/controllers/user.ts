@@ -1,8 +1,13 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import prisma from "@/utils/prisma";
 import * as status from "http-status";
 import { IPostProfileParams } from "@/types/profile";
 import createResponseError from "@/utils/createResponseError";
+import decode from "@/utils/decode";
+import { IDecoded } from "@/types/decode";
+import { IApiImage } from "@/types/uploadImage";
+import { uploadToCloudinary } from "./uploadImage";
+import { FileArray, UploadedFile } from "express-fileupload";
 
 export const getUsers = async ( req: Request, res: Response ) => {
 	try {
@@ -65,6 +70,87 @@ export const postUser = async ( req: Request, res: Response ) => {
 			data    : results
 		} )
 	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
+
+export const getProfile: RequestHandler = async ( req, res ) => {
+	try {
+		const decoded = decode( req ) as IDecoded
+
+		const resulst = await prisma.user.findUnique( {
+			where : {
+				id : decoded.id
+			}
+		} )
+		
+		return res.status( status.OK ).json( {
+			message : "Success",
+			status  : status.OK,
+			data    : resulst
+		} )
+	} catch ( error ) {
+		createResponseError( res, error )
+	}
+}
+export const updateProfile: RequestHandler = async ( req, res ) => {
+	try {
+		const decoded = decode( req ) as IDecoded
+		const body = req.body
+		let files: UploadedFile[] = []
+		if ( req.files ){
+			files = Object.values( req?.files as FileArray ).flat()
+		}
+
+		let imageUrl: string = ''
+
+		if ( files?.length === 1 ){
+
+			const imageData: IApiImage = await uploadToCloudinary( files[0], 'web-profile' ) as IApiImage;
+			imageUrl = imageData?.secure_url
+		}
+
+		const payload = () => {
+			const openToWork = body.openToWork === 'true' ? true : false
+			if( imageUrl !== '' ){
+				return {
+					...body,
+					openToWork  : openToWork,
+					personImage : imageUrl
+				}
+			}else{
+				return{
+					...body,
+					openToWork : openToWork,
+				}
+			}
+		}
+
+		const results = await prisma.user.update( {
+			where : {
+				id : decoded.id
+			},
+			data : {
+				...payload()
+			},
+			// select : {
+			// 	name        : true,
+			// 	email       : true,
+			// 	quote       : true,
+			// 	textBg      : true,
+			// 	personImage : true,
+			// 	avatar      : true
+			// }
+		} )
+		
+		return res.status( status.OK ).json( {
+			message : "Success",
+			status  : status.OK,
+			data    : {
+				...results
+			}
+		} )
+	} catch ( error ) {
 		createResponseError( res, error )
 	}
 }

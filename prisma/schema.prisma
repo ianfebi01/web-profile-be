@@ -16,6 +16,9 @@ model User {
   name String
   avatar String?
   quote String?
+  textBg String?
+  openToWork Boolean? @default(false)
+  personImage String?
   positionId Int? @unique
   position Position? @relation(fields: [positionId],references: [id])
   portofolios Portofolio[]
