@@ -1,9 +1,11 @@
 
+import { IResponse } from "@/types"
 import createResponseError from "@/utils/createResponseError"
 import removeTmp from "@/utils/removeTmp"
-import cloudinary from "cloudinary"
+import cloudinary, { UploadApiResponse } from "cloudinary"
 import { Request, RequestHandler, Response } from "express"
 import  { FileArray, UploadedFile } from "express-fileupload"
+import * as status from "http-status"
 
 // cloudinary.config( {
 // 	cloud_name : process.env.CLOUD_NAME,
@@ -34,6 +36,17 @@ export const uploadImage = async ( req: Request, res: Response ) => {
 		createResponseError( res, error )
 	}
 }
+export const uploadImageBase64 = async ( req: Request, res: Response ) => {
+	try {
+		const { path, image } = req.body
+
+		const result = await uploadToCloudinaryBase64( image, path );
+		
+		return res.json( result );
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
 
 export const deleteImage: RequestHandler = async ( req, res ) => {
 	try {
@@ -59,5 +72,37 @@ export const uploadToCloudinary = async ( file: UploadedFile, path: string ) => 
 		return results
 	} catch ( error: unknown ) {
 		return error
+	}
+};
+export const uploadToCloudinaryBase64 = async ( base64: string, path: string ): Promise<IResponse<UploadApiResponse>> => {
+	try {
+	
+		const results =  await cloudinary.v2.uploader.upload(
+			base64,
+			{ folder : path, tags : "basic_sample", overwrite : true, },
+		);
+		
+		return {
+			message : "Success",
+			status  : status.OK,
+			data    : results
+		}
+	} catch ( error: unknown ) {
+		if ( typeof error === "string" ) {
+			return {
+				message : error,
+				status  : status.INTERNAL_SERVER_ERROR,
+			}
+		} else if ( error instanceof Error ) {
+			return {
+				message : error.message,
+				status  : status.INTERNAL_SERVER_ERROR,
+			} 
+		} else {			
+			return {
+				message : "Error upload image",
+				status  : status.INTERNAL_SERVER_ERROR,
+			}
+		}
 	}
 };

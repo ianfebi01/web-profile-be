@@ -5,9 +5,10 @@ import { IPostProfileParams } from "@/types/profile";
 import createResponseError from "@/utils/createResponseError";
 import decode from "@/utils/decode";
 import { IDecoded } from "@/types/decode";
-import { IApiImage } from "@/types/uploadImage";
-import { uploadToCloudinary } from "./uploadImage";
-import { FileArray, UploadedFile } from "express-fileupload";
+import {  uploadToCloudinaryBase64 } from "./uploadImage";
+import { IResponse } from "@/types";
+import { UploadApiResponse } from "cloudinary";
+// import { FileArray, UploadedFile } from "express-fileupload";
 
 export const getUsers = async ( req: Request, res: Response ) => {
 	try {
@@ -97,19 +98,39 @@ export const updateProfile: RequestHandler = async ( req, res ) => {
 	try {
 		const decoded = decode( req ) as IDecoded
 		const body = req.body
-		let files: UploadedFile[] = []
-		if ( req.files ){
-			files = Object.values( req?.files as FileArray ).flat()
-		}
-
 		let imageUrl: string = ''
 
-		if ( files?.length === 1 ){
-
-			const imageData: IApiImage = await uploadToCloudinary( files[0], 'web-profile' ) as IApiImage;
-			imageUrl = imageData?.secure_url
+		if ( body.personImage ){
+			const mimeType = body.personImage.substring( "data:".length, body.personImage.indexOf( ";base64" ) )
+			if (
+				mimeType !== 'image/jpeg' &&
+				mimeType !== 'image/png' &&
+				mimeType !== 'image/gif' &&
+				mimeType !== 'image/webp' &&
+				mimeType !== 'image/svg+xml'
+			) {
+				return res.status( status.BAD_REQUEST ).json( {
+					message : "Unsupported format",
+					status  : status.BAD_REQUEST
+				} )
+			}
+			const fileSize = Buffer.from( body.personImage.substring( body.personImage.indexOf( ',' ) + 1 ), 'base64' )?.length
+			if ( fileSize > 1024 * 1024 * 4 ) {
+				// throw createHttpError( status.BAD_REQUEST, 'File size is too large' ) 
+				return res.status( status.BAD_REQUEST ).json( {
+					message : "File size is too large",
+					status  : status.BAD_REQUEST
+				} )
+			}
+	
+			const imageData: IResponse<UploadApiResponse> = await uploadToCloudinaryBase64( body.personImage, 'web-profile' );
+			if ( imageData?.status === 500 ){
+				return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+					...imageData
+				} )
+			} else if( imageData?.status === 200 && imageData?.data?.secure_url )imageUrl = imageData?.data?.secure_url
+	
 		}
-
 		const payload = () => {
 			const openToWork = body.openToWork === 'true' ? true : false
 			if( imageUrl !== '' ){
@@ -133,14 +154,6 @@ export const updateProfile: RequestHandler = async ( req, res ) => {
 			data : {
 				...payload()
 			},
-			// select : {
-			// 	name        : true,
-			// 	email       : true,
-			// 	quote       : true,
-			// 	textBg      : true,
-			// 	personImage : true,
-			// 	avatar      : true
-			// }
 		} )
 		
 		return res.status( status.OK ).json( {

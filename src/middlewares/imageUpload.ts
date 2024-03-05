@@ -45,5 +45,45 @@ const imageUpload: RequestHandler = async( req, res, next ) => {
 		createResponseError( res, error )
 	}
 }
+export const validateImageBase64: RequestHandler = async( req, res, next ) => {
+	try {
+
+		const { image } = req.body
+		if ( !image ) {
+			// throw createHttpError( status.BAD_REQUEST, 'No files selected' ) 
+			return res.status( status.BAD_REQUEST ).json( {
+				message : "No files selected",
+				status  : status.BAD_REQUEST
+			} )
+		}
+		const mimeType = image.substring( "data:".length, image.indexOf( ";base64" ) )
+		if (
+			mimeType !== 'image/jpeg' &&
+			mimeType !== 'image/png' &&
+			mimeType !== 'image/gif' &&
+			mimeType !== 'image/webp' &&
+			mimeType !== 'image/svg+xml'
+		) {
+			return res.status( status.BAD_REQUEST ).json( {
+				message : "Unsupported format",
+				status  : status.BAD_REQUEST
+			} )
+		}
+		const fileSize = Buffer.from( image.substring( image.indexOf( ',' ) + 1 ), 'base64' )?.length
+		if ( fileSize > 1024 * 1024 * 4 ) {
+			// throw createHttpError( status.BAD_REQUEST, 'File size is too large' ) 
+			return res.status( status.BAD_REQUEST ).json( {
+				message : "File size is too large",
+				status  : status.BAD_REQUEST
+			} )
+		}
+
+		if ( ! res.headersSent ) {
+			next()
+		}
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
 
 export default imageUpload

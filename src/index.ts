@@ -5,12 +5,15 @@ import createError from 'http-errors'
 import { promises as fspromises } from 'node:fs';
 import fileUpload from "express-fileupload"
 import * as status from "http-status"
+import bodyParser = require( 'body-parser' );
 
 dotenv.config()
 
 const app: Express = express()
 
-app.use( express.json() )
+// app.use( express.json() )
+app.use( bodyParser.json( { limit : '10mb' } ) );
+app.use( bodyParser.urlencoded( { extended : true, limit : '10mb' } ) );
 
 // Cors
 app.use( cors() )
