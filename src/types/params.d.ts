@@ -1,4 +1,4 @@
-export interface IDynamicForm{
+export interface IParams{
     name: string,
     label: string,
     type: string,

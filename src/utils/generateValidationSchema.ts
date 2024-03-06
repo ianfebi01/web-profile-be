@@ -1,10 +1,10 @@
-import { IDynamicForm } from '@/types/form'
+import { IParams } from '@/types/params'
 import * as yup from 'yup'
 
 type Valid = Record<string, | yup.NumberSchema<number | undefined, yup.AnyObject, undefined, ''>
 | yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>>
 
-export const generateValidationSchema = ( fields: IDynamicForm[] ) => {
+export const generateValidationSchema = ( fields: IParams[] ) => {
 	const validationsGroup: Valid = {}
 	for ( const field of fields ) {
 		let validations: any = yup
