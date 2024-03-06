@@ -8,7 +8,73 @@ import { IDecoded } from "@/types/decode";
 import {  uploadToCloudinaryBase64 } from "./uploadImage";
 import { IResponse } from "@/types";
 import { UploadApiResponse } from "cloudinary";
+import { IDynamicForm } from "@/types/form";
+import { generateValidationSchema } from "@/utils/generateValidationSchema";
 // import { FileArray, UploadedFile } from "express-fileupload";
+
+const updateProfileParams: IDynamicForm[] = [
+	{
+		name       : 'name',
+		type       : 'text',
+		label      : 'Name',
+		validation : {
+			charLength : {
+				min : 3,
+				max : 30
+			},
+			required : true
+		}
+	},
+	{
+		name       : 'email',
+		type       : 'email',
+		label      : 'Email',
+		validation : {
+			charLength : {
+				min : 3,
+				max : 30
+			},
+			required : true
+		}
+	},
+	{
+		name       : 'textBg',
+		type       : 'text',
+		label      : 'Text on BG',
+		validation : {
+			charLength : {
+				min : 3,
+				max : 30
+			},
+			required : false
+		}
+	},
+	{
+		name       : 'quote',
+		type       : 'text',
+		label      : 'Quote',
+		validation : {
+			charLength : {
+				min : 3,
+				max : 300
+			},
+			required : false
+		}
+	},
+	{
+		name       : 'openToWork',
+		type       : 'text',
+		label      : 'Open to work',
+		validation : {
+			required : false
+		}
+	},
+	{
+		name  : 'personImage',
+		type  : 'text',
+		label : 'Person Image',
+	},
+]
 
 export const getUsers = async ( req: Request, res: Response ) => {
 	try {
@@ -96,8 +162,11 @@ export const getProfile: RequestHandler = async ( req, res ) => {
 }
 export const updateProfile: RequestHandler = async ( req, res ) => {
 	try {
-		const decoded = decode( req ) as IDecoded
 		const body = req.body
+		const validationSchema = generateValidationSchema( updateProfileParams )
+		validationSchema.validateSync( body, { abortEarly : false, stripUnknown : true } );
+
+		const decoded = decode( req ) as IDecoded
 		let imageUrl: string = ''
 
 		if ( body.personImage ){
