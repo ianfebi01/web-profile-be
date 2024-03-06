@@ -9,9 +9,9 @@ const createResponseError = ( res: Response, error: unknown ) => {
 			status  : status.INTERNAL_SERVER_ERROR,
 		} )
 	} else if ( error instanceof ValidationError ) {		
-		return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+		return res.status( status.UNPROCESSABLE_ENTITY ).json( {
 			message : "Error validate parameter",
-			status  : status.INTERNAL_SERVER_ERROR,
+			status  : status.UNPROCESSABLE_ENTITY,
 			data    : error.errors
 		} )
 	} else if ( error instanceof Error ) {

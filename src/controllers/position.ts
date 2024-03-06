@@ -3,9 +3,12 @@ import { Request, Response } from "express";
 import * as status from "http-status";
 import createResponseError from "@/utils/createResponseError";
 import { Prisma } from "@prisma/client";
+import { generateValidationSchema } from "@/utils/generateValidationSchema";
+import { addPositionParams } from "@/params/position.params";
 
 export const getPositions = async( req: Request, res: Response ) => {
 	try {
+
 		const q = req.query.q || ''
 		const page = Number( req.query.page ) || 1;
 		const limit = Number( req.query.limit ) || 10;
@@ -56,6 +59,10 @@ export const getPositions = async( req: Request, res: Response ) => {
 export const postPosition = async ( req: Request, res: Response ) => {
 	try {
 		const body  = req.body
+
+		const validationSchema = generateValidationSchema( addPositionParams )
+		validationSchema.validateSync( body, { abortEarly : false, stripUnknown : true } );
+		
 		const { name, description } = body
         
 		const isAlreadyExists = await prisma.position.findUnique( {
