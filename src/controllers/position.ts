@@ -19,7 +19,7 @@ export const getPositions = async( req: Request, res: Response ) => {
 
 		const where: Prisma.PositionWhereInput = {
 			name : {
-				contains : q as string,
+				contains : ( q as string ).trim(),
 				mode     : 'insensitive',
 			}
 		}
