@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx ts-node-dev -r tsconfig-paths/register ./src/index.ts",
-    "build": "rm -rf build && node esbuild.js",
+    "build": "rimraf dist && tsc",
     "lint": "eslint src/** --ext .ts"
   },
   "keywords": [],
