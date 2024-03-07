@@ -76,7 +76,6 @@ export const uploadToCloudinary = async ( file: UploadedFile, path: string ) => 
 };
 export const uploadToCloudinaryBase64 = async ( base64: string, path: string ): Promise<IResponse<UploadApiResponse>> => {
 	try {
-	
 		const results =  await cloudinary.v2.uploader.upload(
 			base64,
 			{ folder : path, tags : "basic_sample", overwrite : true, },
@@ -98,9 +97,10 @@ export const uploadToCloudinaryBase64 = async ( base64: string, path: string ): 
 				message : error.message,
 				status  : status.INTERNAL_SERVER_ERROR,
 			} 
-		} else {			
+		} else {		
+			
 			return {
-				message : "Error upload image",
+				message : ( error as Error ).message,
 				status  : status.INTERNAL_SERVER_ERROR,
 			}
 		}
