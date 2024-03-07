@@ -106,6 +106,7 @@ export const updateProfile: RequestHandler = async ( req, res ) => {
 		const decoded = decode( req ) as IDecoded
 		let imageUrl: string = ''
 
+		// validate Image
 		if ( body.personImage ){
 			const mimeType = body.personImage.substring( "data:".length, body.personImage.indexOf( ";base64" ) )
 			if (

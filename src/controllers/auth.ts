@@ -122,13 +122,6 @@ export const githubAuth: RequestHandler = async( req, res ) => {
 			}
 		} )
 	} catch ( error ) {
-		
-		// if ( axios.isAxiosError( error ) ){
-		// 	return res.status( error?.response?.status as number ).json( {
-		// 		messsage : error?.response?.data?.message,
-		// 		status   : error?.response?.status
-		// 	} )
-		// }
 		createResponseError( res, error )
 	}
 }
