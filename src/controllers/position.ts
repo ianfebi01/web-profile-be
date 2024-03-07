@@ -4,7 +4,7 @@ import * as status from "http-status";
 import createResponseError from "@/utils/createResponseError";
 import { Prisma } from "@prisma/client";
 import { generateValidationSchema } from "@/utils/generateValidationSchema";
-import { addPositionParams } from "@/params/position.params";
+import { addPositionParams, getPositionParams } from "@/params/position.params";
 
 export const getPositions = async( req: Request, res: Response ) => {
 	try {
@@ -13,6 +13,10 @@ export const getPositions = async( req: Request, res: Response ) => {
 		const page = Number( req.query.page ) || 1;
 		const limit = Number( req.query.limit ) || 10;
 		const skip = ( page - 1 ) * limit;
+
+		const validationSchema = generateValidationSchema( getPositionParams )
+		validationSchema.validateSync( { q, page, limit }, { abortEarly : false, stripUnknown : true } );
+
 		const where: Prisma.PositionWhereInput = {
 			name : {
 				contains : q as string,
