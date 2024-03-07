@@ -6,6 +6,7 @@ import { promises as fspromises } from 'node:fs';
 import fileUpload from "express-fileupload"
 import * as status from "http-status"
 import bodyParser = require( 'body-parser' );
+import path = require( 'node:path' );
 
 dotenv.config()
 
@@ -31,7 +32,8 @@ const PORT: string = process.env.PORT ?? "8000"
 
 // Routes
 const init = async () => {
-	const files = await fspromises.readdir( `${__dirname}/routes/v1` );
+	const routesDir = path.resolve( process.cwd(), "routes" );
+	const files = await fspromises.readdir( `${routesDir}/routes/v1` );
 	const createroute = async ( file: string ) => {
 		const route = await import( `./routes/v1/${file}` );
 		app.use( "/v1/", route.default );
