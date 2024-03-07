@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx ts-node-dev -r tsconfig-paths/register ./src/index.ts",
     "build": "rimraf dist && tsc",
-    "lint": "eslint src/** --ext .ts"
+    "lint": "eslint src/** --ext .ts",
+    "run-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
   },
   "keywords": [],
   "author": "Ian Febi S",
