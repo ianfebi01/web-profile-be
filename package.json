@@ -6,10 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx ts-node-dev -r tsconfig-paths/register ./src/index.ts",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf build && tspc",
     "lint": "eslint src/** --ext .ts",
-    "run-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js",
-    "vercel-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
+    "run-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
   },
   "keywords": [],
   "author": "Ian Febi S",
@@ -55,7 +54,9 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "prisma": "^5.6.0",
     "ts-node-dev": "^2.0.0",
+    "ts-patch": "^3.1.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "*"
+    "typescript": "*",
+    "typescript-transform-paths": "^3.4.7"
   }
 }
