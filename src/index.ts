@@ -52,6 +52,9 @@ const errorHandler = ( err: Error, req: Request, res: Response ) => {
 	app.use( "/tes", ( req: Request, res: Response ) => {
 		res.send( 'Hello World!' )
 	} );
+	app.use( "/", ( req: Request, res: Response ) => {
+		res.send( 'Hello World!' )
+	} );
 	// Initialize Routes
 	// await init();
 
