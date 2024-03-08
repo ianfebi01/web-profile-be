@@ -31,7 +31,7 @@ const PORT: string = process.env.PORT ?? "8000"
 
 // Routes
 const init = async () => {
-	const files = await fspromises.readdir( `${__dirname}/routes/v1` );
+	const files = await fspromises.readdir( `${process.cwd()}/routes/v1` );
 	const createroute = async ( file: string ) => {
 		const route = await import( `./routes/v1/${file}` );
 		app.use( "/v1/", route.default );
