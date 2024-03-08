@@ -49,7 +49,9 @@ const errorHandler = ( err: Error, req: Request, res: Response ) => {
 
 ( async() => {
 
-	app.use( "/v1/portofolio", getPortofolio );
+	app.use( "/tes", ( req: Request, res: Response ) => {
+		res.send( 'Hello World!' )
+	} );
 	// Initialize Routes
 	await init();
 
