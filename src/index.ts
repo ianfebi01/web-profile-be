@@ -53,7 +53,7 @@ const errorHandler = ( err: Error, req: Request, res: Response ) => {
 		res.send( 'Hello World!' )
 	} );
 	// Initialize Routes
-	await init();
+	// await init();
 
 	// handle 404 error
 	app.use( ( req: Request, res: Response, next ) => {
