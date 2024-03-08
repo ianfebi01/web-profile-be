@@ -30,11 +30,10 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const http_errors_1 = __importDefault(require("http-errors"));
-// import { promises as fspromises } from 'node:fs';
+const node_fs_1 = require("node:fs");
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const status = __importStar(require("http-status"));
 const bodyParser = require("body-parser");
-// import { getPortofolio } from './controllers/portofolio';
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 // app.use( express.json() )
@@ -50,14 +49,14 @@ app.use((0, express_fileupload_1.default)({
 // Port
 const PORT = process.env.PORT ?? "8000";
 // Routes
-// const init = async () => {
-// 	const files = await fspromises.readdir( `${process.cwd()}/routes/v1` );
-// 	const createroute = async ( file: string ) => {
-// 		const route = await import( `./routes/v1/${file}` );
-// 		app.use( "/v1/", route.default );
-// 	};
-// 	await Promise.all( files.map( createroute ) );
-// }
+const init = async () => {
+    const files = await node_fs_1.promises.readdir(`${process.cwd()}/routes/v1`);
+    const createroute = async (file) => {
+        const route = await Promise.resolve(`${`./routes/v1/${file}`}`).then(s => __importStar(require(s)));
+        app.use("/v1/", route.default);
+    };
+    await Promise.all(files.map(createroute));
+};
 const errorHandler = (err, req, res) => {
     res.status(status.INTERNAL_SERVER_ERROR).send({
         message: err.message,
@@ -65,14 +64,8 @@ const errorHandler = (err, req, res) => {
     });
 };
 (async () => {
-    app.use("/tes", (req, res) => {
-        res.send('Hello World!');
-    });
-    app.use("/", (req, res) => {
-        res.send('Hello World!');
-    });
     // Initialize Routes
-    // await init();
+    await init();
     // handle 404 error
     app.use((req, res, next) => {
         next((0, http_errors_1.default)(404));
