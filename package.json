@@ -1,6 +1,6 @@
 {
   "name": "web-profile-be",
-  "version": "1.0.0",
+  "version": "--cwd",
   "description": "",
   "main": "index.js",
   "scripts": {
