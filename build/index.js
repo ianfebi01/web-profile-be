@@ -50,7 +50,8 @@ app.use((0, express_fileupload_1.default)({
 const PORT = process.env.PORT ?? "8000";
 // Routes
 const init = async () => {
-    const files = await node_fs_1.promises.readdir(`${process.cwd()}/routes/v1`);
+    const routesPath = process.env.NODE_ENV === 'production' ? '/build/routes/v1' : '/routes/v1';
+    const files = await node_fs_1.promises.readdir(`${process.cwd()}${routesPath}`);
     const createroute = async (file) => {
         const route = await Promise.resolve(`${`./routes/v1/${file}`}`).then(s => __importStar(require(s)));
         app.use("/v1/", route.default);
