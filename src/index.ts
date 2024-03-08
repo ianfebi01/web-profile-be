@@ -6,6 +6,7 @@ import { promises as fspromises } from 'node:fs';
 import fileUpload from "express-fileupload"
 import * as status from "http-status"
 import bodyParser = require( 'body-parser' );
+import { getPortofolio } from './controllers/portofolio';
 
 dotenv.config()
 
@@ -48,6 +49,7 @@ const errorHandler = ( err: Error, req: Request, res: Response ) => {
 
 ( async() => {
 
+	app.use( "/v1/portofolio", getPortofolio );
 	// Initialize Routes
 	await init();
 
