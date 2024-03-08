@@ -8,7 +8,8 @@
     "dev": "npx ts-node-dev -r tsconfig-paths/register ./src/index.ts",
     "build": "rimraf build && tspc",
     "lint": "eslint src/** --ext .ts",
-    "run-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js"
+    "run-build": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/index.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "Ian Febi S",
