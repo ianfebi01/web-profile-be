@@ -2,11 +2,11 @@ import express, { Express, Response, Request } from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import createError from 'http-errors'
-import { promises as fspromises } from 'node:fs';
+// import { promises as fspromises } from 'node:fs';
 import fileUpload from "express-fileupload"
 import * as status from "http-status"
 import bodyParser = require( 'body-parser' );
-import { getPortofolio } from './controllers/portofolio';
+// import { getPortofolio } from './controllers/portofolio';
 
 dotenv.config()
 
@@ -31,14 +31,14 @@ app.use(
 const PORT: string = process.env.PORT ?? "8000"
 
 // Routes
-const init = async () => {
-	const files = await fspromises.readdir( `${process.cwd()}/routes/v1` );
-	const createroute = async ( file: string ) => {
-		const route = await import( `./routes/v1/${file}` );
-		app.use( "/v1/", route.default );
-	};
-	await Promise.all( files.map( createroute ) );
-}
+// const init = async () => {
+// 	const files = await fspromises.readdir( `${process.cwd()}/routes/v1` );
+// 	const createroute = async ( file: string ) => {
+// 		const route = await import( `./routes/v1/${file}` );
+// 		app.use( "/v1/", route.default );
+// 	};
+// 	await Promise.all( files.map( createroute ) );
+// }
 
 const errorHandler = ( err: Error, req: Request, res: Response ) => { 
 	res.status( status.INTERNAL_SERVER_ERROR ).send( {
