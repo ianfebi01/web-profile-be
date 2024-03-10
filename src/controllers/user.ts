@@ -107,7 +107,8 @@ export const updateProfile: RequestHandler = async ( req, res ) => {
 		let imageUrl: string = ''
 
 		// validate Image
-		if ( body.personImage ){
+		const urlPattern = new RegExp( /^(https?:\/\/)+.*/ )
+		if ( body.personImage && !urlPattern.test( body.personImage ) ){
 			const mimeType = body.personImage.substring( "data:".length, body.personImage.indexOf( ";base64" ) )
 			if (
 				mimeType !== 'image/jpeg' &&
