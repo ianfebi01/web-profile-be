@@ -3,13 +3,14 @@ import * as status from 'http-status'
 import prisma from '@/utils/prisma'
 import createResponseError from '@/utils/createResponseError'
 import { UploadApiResponse } from 'cloudinary'
-import { IResponse, TypedRequestBody, TypedRequestQuery } from '@/types'
+import { IResponse, TypedRequestBody, TypedRequestParams, TypedRequestQuery } from '@/types'
 import { uploadToCloudinaryBase64 } from './uploadImage'
 import { generateValidationSchema } from '@/utils/generateValidationSchema'
 import { addSkillParams } from '@/params/skill.params'
 import { Response } from 'express'
 import { paginatorParams } from '@/params/global.params'
 import { Prisma } from '@prisma/client'
+import { TypeReference } from 'typescript'
 
 interface IBodyPostSkill {
 	name: string
@@ -219,6 +220,29 @@ export const getSkills = async( req: TypedRequestQuery, res: Response ) => {
 			hasNextPage,
 			total, 
 			totalPage
+		} )
+		// eslint-disable-next-line
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
+
+export const deleteSkill = async ( req: TypedRequestParams<{id: number}>, res: Response ) => {
+	try {
+		const { id } = req.params
+
+		const results = await prisma.skill.delete( {
+			where : {
+				id : Number( id ),
+			}
+		} )
+
+		return res.status( status.OK ).json( {
+			message : "Skill deleted successfully",
+			status  : status.OK,
+			data    : {
+				...results,
+			}
 		} )
 		// eslint-disable-next-line
 	} catch ( error: unknown ) {

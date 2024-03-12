@@ -14,6 +14,9 @@ export interface IResponse<T = never>{
 export interface TypedRequestBody<T> extends Request {
     body: T
 }
+export interface TypedRequestParams<T> extends Request {
+    params: T
+}
 export interface TypedRequestQuery<T = void> extends Request {
     query: IPaginationParams & T
 }
