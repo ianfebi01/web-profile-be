@@ -10,7 +10,6 @@ import { addSkillParams } from '@/params/skill.params'
 import { Response } from 'express'
 import { paginatorParams } from '@/params/global.params'
 import { Prisma } from '@prisma/client'
-import { TypeReference } from 'typescript'
 
 interface IBodyPostSkill {
 	name: string
