@@ -248,3 +248,26 @@ export const deleteSkill = async ( req: TypedRequestParams<{id: number}>, res: R
 		createResponseError( res, error )
 	}
 }
+
+export const getSkill = async ( req: TypedRequestParams<{id: number}>, res: Response ) => {
+	try {
+		const { id } = req.params
+
+		const results = await prisma.skill.findUnique( {
+			where : {
+				id : Number( id ),
+			}
+		} )
+
+		return res.status( status.OK ).json( {
+			message : "Success",
+			status  : status.OK,
+			data    : {
+				...results,
+			}
+		} )
+		// eslint-disable-next-line
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
