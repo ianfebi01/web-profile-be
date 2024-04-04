@@ -7,7 +7,7 @@ import { IResponse, TypedRequestBody, TypedRequestParams, TypedRequestQuery } fr
 import { uploadToCloudinaryBase64 } from './uploadImage'
 import { generateValidationSchema } from '@/utils/generateValidationSchema'
 import { addSkillParams } from '@/params/skill.params'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { paginatorParams } from '@/params/global.params'
 import { Prisma } from '@prisma/client'
 
@@ -265,6 +265,27 @@ export const getSkill = async ( req: TypedRequestParams<{id: number}>, res: Resp
 			data    : {
 				...results,
 			}
+		} )
+		// eslint-disable-next-line
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
+
+export const getSkillList = async ( req: Request, res: Response ) => {
+	try {
+
+		const results = await prisma.skill.findMany( {
+			select : {
+				name : true,
+				id   : true
+			}
+		} )
+
+		return res.status( status.OK ).json( {
+			message : "Success",
+			status  : status.OK,
+			data    : results
 		} )
 		// eslint-disable-next-line
 	} catch ( error: unknown ) {

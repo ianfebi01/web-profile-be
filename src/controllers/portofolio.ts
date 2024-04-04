@@ -69,7 +69,7 @@ export const postPortofolio = async ( req: Request, res: Response ) => {
 	try {
 		const decoded = decode( req ) as IDecoded
 		const body  = req.body
-		const { name, description, year } = body
+		const { name, description, year, skills } = body
         
 		const isAlreadyExists = await prisma.portofolio.findUnique( {
 			where : {
@@ -122,8 +122,15 @@ export const postPortofolio = async ( req: Request, res: Response ) => {
 
 		const results = await prisma.portofolio.create( {
 			data : {
-				name, description, image : imageUrl, year, userId : decoded.id
-			}
+				name, description, image  : imageUrl, year, userId : decoded.id, skills : {
+					connect : skills.map( ( item: number ) => ( {
+						id : item
+					} ) )
+				}
+			},
+			include : {
+				skills : true,
+			},
 		} )
 
 		return res.status( status.CREATED ).json( {
