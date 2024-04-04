@@ -39,7 +39,7 @@ model Portofolio {
   name String @unique
   description String?
   image String
-  year Int
+  year DateTime   @default(now())
   userId Int
   user User @relation(fields: [userId], references: [id])
   skills Skill[]
