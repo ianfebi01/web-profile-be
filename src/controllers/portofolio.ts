@@ -31,9 +31,12 @@ export const getPortofolio = async ( req: Request, res: Response ) => {
 
 		const [results, total] = await Promise.all( [
 			prisma.portofolio.findMany( {
-				where : where,
+				where   : where,
 				skip,
-				take  : limit + 1
+				take    : limit + 1,
+				include : {
+					skills : true
+				}
 			} ),
 			prisma.portofolio.count( {
 				where : where
