@@ -1,32 +1,35 @@
-
-import createResponseError from "@/utils/createResponseError";
-import prisma from "@/utils/prisma";
-import { Prisma } from "@prisma/client";
-import { Request, Response } from "express";
-import * as status from "http-status";
-import { uploadToCloudinaryBase64 } from "./uploadImage";
-import { IDecoded } from "@/types/decode";
-import decode from "@/utils/decode";
-import { generateValidationSchema } from "@/utils/generateValidationSchema";
-import { paginatorParams } from "@/params/global.params";
-import { IResponse } from "@/types";
-import { UploadApiResponse } from "cloudinary";
+import createResponseError from '@/utils/createResponseError'
+import prisma from '@/utils/prisma'
+import { Prisma } from '@prisma/client'
+import { Request, Response } from 'express'
+import * as status from 'http-status'
+import { uploadToCloudinaryBase64 } from './uploadImage'
+import { IDecoded } from '@/types/decode'
+import decode from '@/utils/decode'
+import { generateValidationSchema } from '@/utils/generateValidationSchema'
+import { paginatorParams } from '@/params/global.params'
+import { IResponse } from '@/types'
+import { UploadApiResponse } from 'cloudinary'
+import { addPortofolioParams } from '@/params/portofolio.params'
 
 export const getPortofolio = async ( req: Request, res: Response ) => {
 	try {
 		const q = req.query.q || ''
-		const page = Number( req.query.page ) || 1;
-		const limit = Number( req.query.limit ) || 10;
-		const skip = ( page - 1 ) * limit;
+		const page = Number( req.query.page ) || 1
+		const limit = Number( req.query.limit ) || 10
+		const skip = ( page - 1 ) * limit
 
 		const validationSchema = generateValidationSchema( paginatorParams )
-		validationSchema.validateSync( { q, page, limit }, { abortEarly : false, stripUnknown : true } );
+		validationSchema.validateSync(
+			{ q, page, limit },
+			{ abortEarly : false, stripUnknown : true }
+		)
 
 		const where: Prisma.PortofolioWhereInput = {
 			name : {
 				contains : q as string,
 				mode     : 'insensitive',
-			}
+			},
 		}
 
 		const [results, total] = await Promise.all( [
@@ -35,101 +38,142 @@ export const getPortofolio = async ( req: Request, res: Response ) => {
 				skip,
 				take    : limit + 1,
 				include : {
-					skills : true
-				}
+					skills : true,
+				},
 			} ),
 			prisma.portofolio.count( {
-				where : where
-			} )
+				where : where,
+			} ),
 		] )
 
-		const totalPage = Math.ceil( total / limit );
+		const totalPage = Math.ceil( total / limit )
 
-		let hasNextPage: boolean = false;
-		if ( results.length > limit ) { // if got an extra result
-			hasNextPage = true; // has a next page of results
-			results.pop(); // remove extra result
+		let hasNextPage: boolean = false
+		if ( results.length > limit ) {
+			// if got an extra result
+			hasNextPage = true // has a next page of results
+			results.pop() // remove extra result
 		}
 
 		return res.status( status.OK ).json( {
-			message   : "Success",
+			message   : 'Success',
 			status    : status.OK,
 			data      : results,
 			page,
 			limit,
 			itemCount : results?.length,
 			hasNextPage,
-			total, 
-			totalPage
+			total,
+			totalPage,
 		} )
 		// eslint-disable-next-line
-	} catch ( error: unknown ) {
+  } catch (error: unknown) {
 		createResponseError( res, error )
 	}
 }
 
-export const postPortofolio = async ( req: Request, res: Response ) => {
+export const updatePortofolio = async ( req: Request, res: Response ) => {
 	try {
-		const decoded = decode( req ) as IDecoded
-		const body  = req.body
-		const { name, description, year, skills } = body
-        
+		const body = req.body
+		const { skills } = body
+		const validationSchema = generateValidationSchema( addPortofolioParams )
+		validationSchema.validateSync(
+			body,
+			{ abortEarly : false, stripUnknown : true }
+		)
 		const isAlreadyExists = await prisma.portofolio.findUnique( {
 			where : {
-				name
+				id : parseInt( req.params.id ),
 			},
 			select : {
-				name : true
-			}
+				id : true,
+			},
 		} )
-		
-		if( isAlreadyExists ) return res.status( status.BAD_REQUEST ).json( {
-			message : "Portofolio already exists",
-			status  : status.BAD_REQUEST
-		} )
-		
+
+		if ( !isAlreadyExists )
+			return res.status( status.BAD_REQUEST ).json( {
+				message : 'Portofolio not exists',
+				status  : status.BAD_REQUEST,
+			} )
+
 		let imageUrl: string = ''
 
 		// validate Image
-		if ( body.image ){
-			const mimeType = body.image.substring( "data:".length, body.image.indexOf( ";base64" ) )
+		const urlPattern = new RegExp( /^(https?:\/\/)+.*/ )
+		if ( body.image && !urlPattern.test( body.image ) ) {
+			const mimeType = body.image.substring(
+				'data:'.length,
+				body.image.indexOf( ';base64' )
+			)
 			if (
 				mimeType !== 'image/jpeg' &&
-					mimeType !== 'image/png' &&
-					mimeType !== 'image/gif' &&
-					mimeType !== 'image/webp' &&
-					mimeType !== 'image/svg+xml'
+        mimeType !== 'image/png' &&
+        mimeType !== 'image/gif' &&
+        mimeType !== 'image/webp' &&
+        mimeType !== 'image/svg+xml'
 			) {
 				return res.status( status.BAD_REQUEST ).json( {
-					message : "Unsupported format",
-					status  : status.BAD_REQUEST
+					message : 'Unsupported format',
+					status  : status.BAD_REQUEST,
 				} )
 			}
-			const fileSize = Buffer.from( body.image.substring( body.image.indexOf( ',' ) + 1 ), 'base64' )?.length
+			const fileSize = Buffer.from(
+				body.image.substring( body.image.indexOf( ',' ) + 1 ),
+				'base64'
+			)?.length
 			if ( fileSize > 1024 * 1024 * 4 ) {
-				// throw createHttpError( status.BAD_REQUEST, 'File size is too large' ) 
+				// throw createHttpError( status.BAD_REQUEST, 'File size is too large' )
 				return res.status( status.BAD_REQUEST ).json( {
-					message : "File size is too large",
-					status  : status.BAD_REQUEST
+					message : 'File size is too large',
+					status  : status.BAD_REQUEST,
 				} )
 			}
-		
-			const imageData: IResponse<UploadApiResponse> = await uploadToCloudinaryBase64( body.image, 'web-profile' );
-			if ( imageData?.status === 500 ){
+
+			const imageData: IResponse<UploadApiResponse> =
+        await uploadToCloudinaryBase64( body.image, 'web-profile' )
+			if ( imageData?.status === 500 ) {
 				return res.status( status.INTERNAL_SERVER_ERROR ).json( {
-					...imageData
+					...imageData,
 				} )
-			} else if( imageData?.status === 200 && imageData?.data?.secure_url )imageUrl = imageData?.data?.secure_url
-		
+			} else if ( imageData?.status === 200 && imageData?.data?.secure_url )
+				imageUrl = imageData?.data?.secure_url
 		}
 
-		const results = await prisma.portofolio.create( {
-			data : {
-				name, description, image  : imageUrl, year, userId : decoded.id, skills : {
-					connect : skills.map( ( item: number ) => ( {
-						id : item
-					} ) )
+		const payload = () => {
+			if ( imageUrl !== '' ) {
+				return {
+					...body,
+					image : imageUrl,
 				}
+			} else {
+				return {
+					...body,
+				}
+			}
+		}
+		const currentData = await prisma.portofolio.findUnique( {
+			where : {
+				id : parseInt( req.params.id )
+			},
+			select : {
+				skills : true
+			}
+		} )
+		const deletedSkills = currentData?.skills.filter( item => !skills.includes( item.id ) )
+		const results = await prisma.portofolio.update( {
+			where : {
+				id : parseInt( req.params.id ),
+			},
+			data : {
+				...payload(),
+				skills : {
+					disconnect : deletedSkills?.map( ( item ) => ( {
+						id : item.id
+					} ) ),
+					connect : skills.map( ( item: number ) => ( {
+						id : item,
+					} ) ),
+				},
 			},
 			include : {
 				skills : true,
@@ -137,12 +181,156 @@ export const postPortofolio = async ( req: Request, res: Response ) => {
 		} )
 
 		return res.status( status.CREATED ).json( {
-			message : "Portofolio created",
+			message : 'Portofolio created',
 			status  : status.CREATED,
-			data    : results
+			data    : results,
+		} )
+	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
+export const postPortofolio = async ( req: Request, res: Response ) => {
+	try {
+		const decoded = decode( req ) as IDecoded
+		const body = req.body
+		const { name, description, year, skills } = body
+
+		const validationSchema = generateValidationSchema( addPortofolioParams )
+		validationSchema.validateSync(
+			body,
+			{ abortEarly : false, stripUnknown : true }
+		)
+
+		const isAlreadyExists = await prisma.portofolio.findUnique( {
+			where : {
+				name,
+			},
+			select : {
+				name : true,
+			},
 		} )
 
+		if ( isAlreadyExists )
+			return res.status( status.BAD_REQUEST ).json( {
+				message : 'Portofolio already exists',
+				status  : status.BAD_REQUEST,
+			} )
+
+		let imageUrl: string = ''
+
+		// validate Image
+		if ( body.image ) {
+			const mimeType = body.image.substring(
+				'data:'.length,
+				body.image.indexOf( ';base64' )
+			)
+			if (
+				mimeType !== 'image/jpeg' &&
+        mimeType !== 'image/png' &&
+        mimeType !== 'image/gif' &&
+        mimeType !== 'image/webp' &&
+        mimeType !== 'image/svg+xml'
+			) {
+				return res.status( status.BAD_REQUEST ).json( {
+					message : 'Unsupported format',
+					status  : status.BAD_REQUEST,
+				} )
+			}
+			const fileSize = Buffer.from(
+				body.image.substring( body.image.indexOf( ',' ) + 1 ),
+				'base64'
+			)?.length
+			if ( fileSize > 1024 * 1024 * 4 ) {
+				// throw createHttpError( status.BAD_REQUEST, 'File size is too large' )
+				return res.status( status.BAD_REQUEST ).json( {
+					message : 'File size is too large',
+					status  : status.BAD_REQUEST,
+				} )
+			}
+
+			const imageData: IResponse<UploadApiResponse> =
+        await uploadToCloudinaryBase64( body.image, 'web-profile' )
+			if ( imageData?.status === 500 ) {
+				return res.status( status.INTERNAL_SERVER_ERROR ).json( {
+					...imageData,
+				} )
+			} else if ( imageData?.status === 200 && imageData?.data?.secure_url )
+				imageUrl = imageData?.data?.secure_url
+		}
+
+		const results = await prisma.portofolio.create( {
+			data : {
+				name,
+				description,
+				image  : imageUrl,
+				year,
+				userId : decoded.id,
+				skills : {
+					connect : skills.map( ( item: number ) => ( {
+						id : item,
+					} ) ),
+				},
+			},
+			include : {
+				skills : true,
+			},
+		} )
+
+		return res.status( status.CREATED ).json( {
+			message : 'Portofolio created',
+			status  : status.CREATED,
+			data    : results,
+		} )
 	} catch ( error: unknown ) {
+		createResponseError( res, error )
+	}
+}
+
+export const deletePortofolio = async ( req: Request, res: Response ) => {
+	try {
+		const { id } = req.params
+
+		const results = await prisma.portofolio.delete( {
+			where : {
+				id : Number( id ),
+			},
+		} )
+
+		return res.status( status.OK ).json( {
+			message : 'Portofolio deleted successfully',
+			status  : status.OK,
+			data    : {
+				...results,
+			},
+		} )
+		// eslint-disable-next-line
+  } catch (error: unknown) {
+		createResponseError( res, error )
+	}
+}
+
+export const getDetailPortofolio = async ( req: Request, res: Response ) => {
+	try {
+		const { id } = req.params
+
+		const results = await prisma.portofolio.findUnique( {
+			where : {
+				id : Number( id ),
+			},
+			include : {
+				skills : true,
+			},
+		} )
+
+		return res.status( status.OK ).json( {
+			message : 'Success',
+			status  : status.OK,
+			data    : {
+				...results,
+			},
+		} )
+		// eslint-disable-next-line
+  } catch (error: unknown) {
 		createResponseError( res, error )
 	}
 }

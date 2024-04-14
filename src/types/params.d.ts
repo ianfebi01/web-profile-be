@@ -3,6 +3,9 @@ export interface IParams{
     label: string,
     type: string,
     validation?: IValidation
+    select?: {
+        isMulti?: boolean
+    }
 }
 
 interface IValidation{
@@ -17,4 +20,13 @@ interface IValidation{
     inputRule?: RegExp[],
     numeric?: boolean,
     required?: boolean
+    image?: IImageValidation
 }
+interface IImageValidation {
+    maxSize?: number
+  }
+  
+export interface IOptions{
+    value: string | number
+    label: string
+  }
