@@ -22,6 +22,7 @@ model User {
   positionId Int? @unique
   position Position? @relation(fields: [positionId],references: [id])
   portofolios Portofolio[]
+  experience Experience[]
   userToken UserToken?
 
   @@index([id, email])
@@ -60,4 +61,15 @@ model UserToken{
   refreshToken String @unique
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+}
+
+model Experience{
+  id Int @default(autoincrement()) @id
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  startDate DateTime @default(now())
+  endDate DateTime @default(now())
+  companyName String
+  description String
+  title String
 }
