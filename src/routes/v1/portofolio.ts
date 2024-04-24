@@ -6,7 +6,7 @@ import express, { Router } from "express";
 const router: Router = express.Router()
 
 router.get( '/portofolio', getPortofolio )
-router.get( '/portofolio/:id', verifyAccessToken, getDetailPortofolio )
+router.get( '/portofolio/:id', getDetailPortofolio )
 router.post( '/portofolio', verifyAccessToken, postPortofolio )
 router.put( '/portofolio/:id', verifyAccessToken, updatePortofolio )
 router.delete( '/portofolio/:id', verifyAccessToken, deletePortofolio )
