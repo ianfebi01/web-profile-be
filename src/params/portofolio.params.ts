@@ -20,7 +20,6 @@ export const  addPortofolioParams: IParams[]  = [
 		validation : {
 			charLength : {
 				min : 3,
-				max : 300
 			},
 			required : true
 		}
