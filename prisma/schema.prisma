@@ -44,6 +44,8 @@ model Portofolio {
   userId Int
   user User @relation(fields: [userId], references: [id])
   skills Skill[]
+
+  @@index(fields: [name])
 }
 
 model Skill {
