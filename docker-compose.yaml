@@ -10,5 +10,20 @@ services:
       - postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - app
+  web-profile-be:
+    restart: always
+    build: .
+    container_name: web-profile-be
+    ports:
+      - 8000:8000
+    networks:
+      - app
+    env_file:
+      - .env
+networks:
+  app:
+    driver: bridge
 volumes:
   postgres:

@@ -50,7 +50,7 @@
     ],
     "newline-before-return": "error",
     "object-curly-spacing": ["error", "always"],
-    "no-console": "error",
+    "no-console": "warn",
     "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
     "space-infix-ops": ["error", { "int32Hint": false }],
     "arrow-spacing": "error",
