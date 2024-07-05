@@ -29,7 +29,13 @@ const generateValidationSchema = (fields) => {
     const validationsGroup = {};
     for (const field of fields) {
         let validations = yup;
-        validations = validations.string();
+        if (field.type === 'array') {
+            validations = validations.array().of(validations.string());
+            if (field.validation?.required)
+                validations = validations = validations.min(1);
+        }
+        else
+            validations = validations.string();
         if (field.validation?.required)
             validations = validations = validations.required();
         if (field.type === 'email')
@@ -47,7 +53,7 @@ const generateValidationSchema = (fields) => {
         validationsGroup[field.name] = validations.label(field.label);
     }
     return yup.object({
-        ...validationsGroup
+        ...validationsGroup,
     });
 };
 exports.generateValidationSchema = generateValidationSchema;

@@ -124,7 +124,8 @@ const updateProfile = async (req, res) => {
         const decoded = (0, decode_1.default)(req);
         let imageUrl = '';
         // validate Image
-        if (body.personImage) {
+        const urlPattern = new RegExp(/^(https?:\/\/)+.*/);
+        if (body.personImage && !urlPattern.test(body.personImage)) {
             const mimeType = body.personImage.substring("data:".length, body.personImage.indexOf(";base64"));
             if (mimeType !== 'image/jpeg' &&
                 mimeType !== 'image/png' &&
